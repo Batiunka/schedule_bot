@@ -9,8 +9,8 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
-TOKEN = getenv('TOKEN')
-ADMIN_ID = getenv('ADMIN_ID')
+TOKEN = getenv("TOKEN")
+ADMIN_ID = getenv("ADMIN_ID")
 dp = Dispatcher()
 
 
@@ -20,25 +20,32 @@ class Schedule:
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    print(f'new user {message.from_user.username} id {message.from_user.id}')
+    print(f"new user {message.from_user.username} id {message.from_user.id}")
     await message.reply("Hey, welcome!")
 
 
 def generate_reply(schedule, shift=0):
     try:
-        if schedule.schedule_list[datetime.datetime.now().day - shift] is not "L":
-            message = "You're slave, baby😈"
-        else:
-            message = "You can fly😎😎😎😎😎😎😎"
+        shift_letter = schedule.schedule_list[datetime.datetime.now().day - shift]
     except Exception as e:
-        print(f'Error generating the reply {e}')
-        message = "Update your schedule"
-    return message
+        print(f"Error generating the reply {e}")
+        return "Update your schedule"
+    match shift_letter:
+        case "L":
+            return "You can fly😎😎😎😎😎😎😎"
+        case "M":
+            return "You should go to bed (morning)"
+        case "E":
+            return "music for night ride turns on"
+        case _:
+            return "there is object unidentified"
 
 
 @dp.message()
 async def message_handler(message: Message):
-    print(f'message {message.from_user.id} {message.from_user.username}: {message.text}')
+    print(
+        f"message {message.from_user.id} {message.from_user.username}: {message.text}"
+    )
     try:
         match message.text:
             case "/today":
@@ -65,11 +72,11 @@ async def message_handler(message: Message):
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    logging.info('bot created, starting to poll')
+    print("bot created, starting to poll")
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    print('starting...')
+    print("starting...")
     s = Schedule()
     asyncio.run(main())
