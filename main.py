@@ -60,12 +60,19 @@ async def message_handler(message: Message):
                         await message.answer(f"Your weekend is in {i + 1} days")
                         break
             case _:
-                if str(message.from_user.id) == ADMIN_ID:
-                    schedule = message.text.split()
-                    Schedule.schedule_list = schedule
-                    await message.answer("Your schedule is list now!")
+                if message.text.startswith('/date'):
+                    try:
+                        date = int(message.text.split()[1])
+                        await message.answer(f'This will be {s.schedule_list[date-1]}')
+                    except:
+                        await message.answer("Error!")
                 else:
-                    await message.answer("You know nothing, Jon Snow!")
+                    if str(message.from_user.id) == ADMIN_ID:
+                        schedule = message.text.split()
+                        Schedule.schedule_list = schedule
+                        await message.answer("Your schedule is list now!")
+                    else:
+                        await message.answer("You know nothing, Jon Snow!")
     except Exception as e:
         print(f"Error {e}")
 
